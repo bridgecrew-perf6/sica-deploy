@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sica-auth-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sica-auth-service
+  template:
+    metadata:
+      labels:
+        app: sica-auth-service
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: sica-auth-service
+        image: sicapoc.azurecr.io/sica-auth-service:aab380a3346900a9a5093d7226f68383db4b59cb
+        ports:
+          - containerPort: 8080
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: JWT_SECRET
+            value: secret
+          - name: DATABASE_URL
+            value: jdbc:postgresql://localhost:5432/ativos-service?sslmode=require
+          - name: DATABASE_USERNAME
+            value: user
+          - name: DATABASE_PASSWORD
+            value: pass
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sica-auth-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8080
+  selector:
+    app: sica-auth-service

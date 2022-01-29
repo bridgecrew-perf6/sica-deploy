@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sica-portal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sica-portal
+  template:
+    metadata:
+      labels:
+        app: sica-portal
+    spec:
+      containers:
+      - name: sica-portal
+        image: sicapoc.azurecr.io/sica-portal:5da75334a777b5b5c96de60a8d8c38fbaed5fc64
+        ports:
+          - containerPort: 80
+        imagePullPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sica-portal
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      protocol: TCP
+  selector:
+    app: sica-portal

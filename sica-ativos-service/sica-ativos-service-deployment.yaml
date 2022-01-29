@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sica-ativos-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sica-ativos-service
+  template:
+    metadata:
+      labels:
+        app: sica-ativos-service
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: sica-ativos-service
+        image: sicapoc.azurecr.io/sica-ativos-service:f755e5358e3170ff302b3c80ef7d1b1bc788fbb2
+        ports:
+          - containerPort: 8080
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: AUTH_URL
+            value: http://40.88.232.54:8080/auth
+          - name: DATABASE_URL
+            value: jdbc:postgresql://localhost:5432/ativos-service?sslmode=require
+          - name: DATABASE_USERNAME
+            value: user
+          - name: DATABASE_PASSWORD
+            value: pass
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sica-ativos-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8080
+  selector:
+    app: sica-ativos-service
